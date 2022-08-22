@@ -1,5 +1,7 @@
 import { Row, Col } from "react-bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { MultiSelect } from "react-multi-select-component";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -8,12 +10,12 @@ import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import nlLocale from "@fullcalendar/core/locales/nl";
 import momentPlugin from "@fullcalendar/moment";
 
-import { getTimetableForID } from "../../_services/roosterService";
+import { getTimetableForID, getCollegas } from "../../_services/roosterService";
 
 function Home() {
   const [timetable, setTimetable] = useState([]);
-  const [selectedCollegas] = useState(["244877.3"]); // select Maartje Eyskens
-  const [calResources] = useState([{ id: "244877.3", title: "Maartje Eyskens" }]);
+  const [selectedCollegas, setSelectedCollegas] = useState(JSON.parse(localStorage.getItem("selectedCollegas")) || []);
+  const [selectedDateInfo, setSelectedDateInfo] = useState(null);
 
   const views = {
     resourceTimeGridSevenDay: {
@@ -24,16 +26,17 @@ function Home() {
   };
 
   const loadData = async dateInfo => {
-    const promises = selectedCollegas.map(async id => {
-      let start = null;
-      let end = null;
+    const promises = selectedCollegas.map(async col => {
+      let start = selectedDateInfo ? selectedDateInfo.start : null;
+      let end = selectedDateInfo ? selectedDateInfo.end : null;
       if (dateInfo) {
         start = dateInfo.start;
         end = dateInfo.end;
+        setSelectedDateInfo(dateInfo);
       }
-      const data = await getTimetableForID(id, start, end);
+      const data = await getTimetableForID(col.value, start, end);
       data.map(d => {
-        d.resourceId = id;
+        d.resourceId = col.value;
         return d;
       });
       return data;
@@ -59,6 +62,11 @@ function Home() {
     setTimetable(events);
   };
 
+  useEffect(() => {
+    window.localStorage.setItem("selectedCollegas", JSON.stringify(selectedCollegas));
+    loadData();
+  }, [selectedCollegas]);
+
   const renderEventContent = eventInfo => (
     <>
       <p>
@@ -72,6 +80,8 @@ function Home() {
           {eventInfo.event.extendedProps.campus && " "}
           {eventInfo.event.extendedProps.room}
         </b>
+        <br />
+        {eventInfo.event.extendedProps.classes.join(" ")}
       </p>
     </>
   );
@@ -92,7 +102,7 @@ function Home() {
             schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
             events={timetable}
             firstDay={1}
-            resources={calResources}
+            resources={selectedCollegas.map(c => ({ id: c.value, title: c.label }))}
             scrollTime="08:15:00"
             allDaySlot={false}
             eventDisplay="block"
@@ -107,6 +117,7 @@ function Home() {
         </Col>
         <Col md={2}>
           <h3>Collega&#39;s</h3>
+          <MultiSelect options={getCollegas()} value={selectedCollegas} onChange={setSelectedCollegas} labelledBy="Select" />
 
           <h3>Klassen</h3>
         </Col>
