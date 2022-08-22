@@ -117,6 +117,8 @@ func improveRoom(room string) (campus, roomName, info string) {
 	return
 }
 
+var toRemoveInClasses = []string{" EI", " TI", "GTI ", "LTI ", "TTI "}
+
 func improveClasses(in string) []string {
 	in = strings.TrimSpace(in)
 	if in == "" {
@@ -130,9 +132,9 @@ func improveClasses(in string) []string {
 		if class == "" {
 			continue
 		}
-		// remove EI and TI from class name for ITF
-		class = strings.Replace(class, " EI", "", -1)
-		class = strings.Replace(class, " TI", "", -1)
+		for _, rm := range toRemoveInClasses {
+			class = strings.Replace(class, rm, "", -1)
+		}
 
 		classes = append(classes, class)
 	}
