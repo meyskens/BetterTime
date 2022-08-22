@@ -7,6 +7,17 @@ import (
 	"time"
 )
 
+func MustLoadTZ(tz string) *time.Location {
+	loc, err := time.LoadLocation(tz)
+	if err != nil {
+		panic(err)
+	}
+	return loc
+}
+
+// Europe/Brussels
+var tz = MustLoadTZ("Europe/Brussels")
+
 type Event struct {
 	OLA      string    `json:"ola"`
 	ZCode    string    `json:"zCode"`
@@ -72,8 +83,8 @@ func (te *teReservation) ToEvent(cols []string) Event {
 
 	campus, roomName, info := improveRoom(te.Columns[roomIndex])
 
-	startTime, _ := time.Parse("02-01-2006 15:04", fmt.Sprintf("%s %s", te.Startdate, te.Starttime))
-	endTime, _ := time.Parse("02-01-2006 15:04", fmt.Sprintf("%s %s", te.Enddate, te.Endtime))
+	startTime, _ := time.ParseInLocation("02-01-2006 15:04", fmt.Sprintf("%s %s", te.Startdate, te.Starttime), tz)
+	endTime, _ := time.ParseInLocation("02-01-2006 15:04", fmt.Sprintf("%s %s", te.Enddate, te.Endtime), tz)
 
 	return Event{
 		OLA:      olaMatches[2],
