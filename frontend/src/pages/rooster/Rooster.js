@@ -1,5 +1,5 @@
-import { Row, Col } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { Row, Col, Dropdown } from "react-bootstrap";
+import { useEffect, useState, createRef } from "react";
 
 import { MultiSelect } from "react-multi-select-component";
 
@@ -7,11 +7,19 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
+import listPlugin from "@fullcalendar/list";
 import nlLocale from "@fullcalendar/core/locales/nl";
 import momentPlugin from "@fullcalendar/moment";
 
 import { getTimetableForID, getCollegas, getClassesForQuery } from "../../_services/roosterService";
 import { CLASS_SEARCH } from "../../Config";
+
+const calViews = [
+  { name: "Week", value: "resourceTimeGridSevenDay" },
+  { name: "Week (parallel)", value: "weekParallel" },
+  { name: "Maand", value: "dayGridMonth" },
+  { name: "Lijst", value: "listWeek" },
+];
 
 function Home() {
   const [timetable, setTimetable] = useState([]);
@@ -21,9 +29,18 @@ function Home() {
   const [classOptions, setClassOptions] = useState([]);
   const [selectedClasses, setSelectedClasses] = useState(JSON.parse(localStorage.getItem("selectedClasses")) || []);
 
+  const [calView, setCalView] = useState(JSON.parse(localStorage.getItem("calView")) || calViews[0]);
+  const calendarRef = createRef();
+
   const views = {
     resourceTimeGridSevenDay: {
       type: "resourceTimeGrid",
+      duration: { days: 7 },
+      buttonText: "Week",
+      datesAboveResources: selectedClasses.length + selectedCollegas.length > 1,
+    },
+    weekParallel: {
+      type: "timeGridWeek",
       duration: { days: 7 },
       buttonText: "Week",
     },
@@ -53,6 +70,7 @@ function Home() {
       const data = await getTimetableForID(col.value, start, end);
       data.map(d => {
         d.resourceId = col.value;
+        d.source = col.label;
         return d;
       });
       return data;
@@ -71,6 +89,7 @@ function Home() {
             campus: c.campus,
             room: c.room,
             classes: c.classes,
+            source: c.source,
           },
         });
       }),
@@ -85,6 +104,11 @@ function Home() {
   }, [selectedCollegas, selectedClasses]);
 
   useEffect(() => {
+    window.localStorage.setItem("calView", JSON.stringify(calView));
+    calendarRef.current.getApi().changeView(calView.value);
+  }, [calView]);
+
+  useEffect(() => {
     loadClassOptions();
   }, []);
 
@@ -94,6 +118,14 @@ function Home() {
         <b>{eventInfo.timeText}</b>
         <br />
         <i>{eventInfo.event.title}</i>
+        {calView.value !== "resourceTimeGridSevenDay" ? (
+          <>
+            <br />
+            {eventInfo.event.extendedProps.source}
+          </>
+        ) : (
+          ""
+        )}
         <br />
         <b>
           {eventInfo.event.extendedProps.campus}
@@ -116,9 +148,9 @@ function Home() {
       <Row>
         <Col md={10}>
           <FullCalendar
-            plugins={[dayGridPlugin, resourceTimelinePlugin, resourceTimeGridPlugin, momentPlugin]}
+            plugins={[dayGridPlugin, resourceTimelinePlugin, resourceTimeGridPlugin, momentPlugin, listPlugin]}
             views={views}
-            initialView="resourceTimeGridSevenDay"
+            initialView={calView.value}
             schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
             events={timetable}
             firstDay={1}
@@ -133,9 +165,23 @@ function Home() {
             locale={nlLocale}
             titleFormat={{ day: "2-digit", month: "long", year: "numeric" }}
             dayHeaderFormat="ddd DD/MM"
+            ref={calendarRef}
           />
         </Col>
         <Col md={2}>
+          <Dropdown>
+            <Dropdown.Toggle variant="primary" id="dropdown-basic">
+              {calView.name}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              {calViews.map(c => (
+                <Dropdown.Item key={c.value} onClick={() => setCalView(c)}>
+                  {c.name}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
           <h3>Collega&#39;s</h3>
           <MultiSelect options={getCollegas()} value={selectedCollegas} onChange={setSelectedCollegas} labelledBy="Select" />
 
