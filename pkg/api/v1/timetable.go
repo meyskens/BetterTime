@@ -10,6 +10,7 @@ import (
 func init() {
 	registers = append(registers, func(e *echo.Echo, h *HTTPHandler) {
 		e.GET("/v1/timetable/:id", h.getTimeTable)
+		e.GET("/v1/classes/search", h.searchClasses)
 	})
 }
 
@@ -42,4 +43,17 @@ func (h *HTTPHandler) getTimeTable(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, timetable)
+}
+
+func (h *HTTPHandler) searchClasses(c echo.Context) error {
+	query := c.QueryParam("query")
+	if query == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "query is required"})
+	}
+	classes, err := h.api.GetClassesForQuery(query)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, classes)
 }

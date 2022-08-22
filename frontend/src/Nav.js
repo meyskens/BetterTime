@@ -6,7 +6,7 @@ function AppNav() {
     <Navbar expand="lg" className="mb-5" fixed="top">
       <Container>
         <LinkContainer to="/">
-          <Navbar.Brand>BetterTIme</Navbar.Brand>
+          <Navbar.Brand>BetterTime</Navbar.Brand>
         </LinkContainer>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">

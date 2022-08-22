@@ -20,6 +20,11 @@ type Event struct {
 	Teachers []string  `json:"teachers"`
 }
 
+type Class struct {
+	Name       string `json:"name"`
+	TimeEditID string `json:"timeEditID"`
+}
+
 type teReservation struct {
 	Columns   []string `json:"columns"`
 	Enddate   string   `json:"enddate"`
@@ -117,7 +122,8 @@ func improveRoom(room string) (campus, roomName, info string) {
 	return
 }
 
-var toRemoveInClasses = []string{" EI", " TI", "GTI ", "LTI ", "TTI "}
+var toRemoveInClasses = []string{" EI", " TI"}
+var toRemoveInClassesSchedule = []string{"GTI ", "LTI ", "TTI "}
 
 func improveClasses(in string) []string {
 	in = strings.TrimSpace(in)
@@ -135,6 +141,9 @@ func improveClasses(in string) []string {
 		for _, rm := range toRemoveInClasses {
 			class = strings.Replace(class, rm, "", -1)
 		}
+		for _, rm := range toRemoveInClassesSchedule {
+			class = strings.Replace(class, rm, "", -1)
+		}
 
 		classes = append(classes, class)
 	}
@@ -143,6 +152,18 @@ func improveClasses(in string) []string {
 	classes = removeDuplicates(classes)
 
 	return classes
+}
+
+func improveSearchClass(class string) string {
+	for _, rm := range toRemoveInClasses {
+		class = strings.Replace(class, rm, "", -1)
+	}
+
+	class = strings.TrimSpace(class)
+
+	class = strings.Split(class, "-2022")[0] // filter out -2022-xxxx, the 2023 is a problem for next year!
+
+	return class
 }
 
 func removeDuplicates(in []string) []string {

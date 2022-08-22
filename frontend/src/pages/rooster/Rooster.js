@@ -10,12 +10,16 @@ import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import nlLocale from "@fullcalendar/core/locales/nl";
 import momentPlugin from "@fullcalendar/moment";
 
-import { getTimetableForID, getCollegas } from "../../_services/roosterService";
+import { getTimetableForID, getCollegas, getClassesForQuery } from "../../_services/roosterService";
+import { CLASS_SEARCH } from "../../Config";
 
 function Home() {
   const [timetable, setTimetable] = useState([]);
   const [selectedCollegas, setSelectedCollegas] = useState(JSON.parse(localStorage.getItem("selectedCollegas")) || []);
   const [selectedDateInfo, setSelectedDateInfo] = useState(null);
+
+  const [classOptions, setClassOptions] = useState([]);
+  const [selectedClasses, setSelectedClasses] = useState(JSON.parse(localStorage.getItem("selectedClasses")) || []);
 
   const views = {
     resourceTimeGridSevenDay: {
@@ -25,8 +29,20 @@ function Home() {
     },
   };
 
+  const loadClassOptions = async () => {
+    const promises = CLASS_SEARCH.split(",").map(classSearch => getClassesForQuery(classSearch.trim()));
+    const result = await Promise.all(promises);
+    setClassOptions(
+      result
+        .flat()
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(c => ({ value: c.timeEditID, label: c.name }))
+        .filter((c, i, arr) => arr.findIndex(d => d.label === c.label) === i),
+    );
+  };
+
   const loadData = async dateInfo => {
-    const promises = selectedCollegas.map(async col => {
+    const promises = selectedCollegas.concat(selectedClasses).map(async col => {
       let start = selectedDateInfo ? selectedDateInfo.start : null;
       let end = selectedDateInfo ? selectedDateInfo.end : null;
       if (dateInfo) {
@@ -64,8 +80,13 @@ function Home() {
 
   useEffect(() => {
     window.localStorage.setItem("selectedCollegas", JSON.stringify(selectedCollegas));
+    window.localStorage.setItem("selectedClasses", JSON.stringify(selectedClasses));
     loadData();
-  }, [selectedCollegas]);
+  }, [selectedCollegas, selectedClasses]);
+
+  useEffect(() => {
+    loadClassOptions();
+  }, []);
 
   const renderEventContent = eventInfo => (
     <>
@@ -73,8 +94,7 @@ function Home() {
         <b>{eventInfo.timeText}</b>
         <br />
         <i>{eventInfo.event.title}</i>
-      </p>
-      <p>
+        <br />
         <b>
           {eventInfo.event.extendedProps.campus}
           {eventInfo.event.extendedProps.campus && " "}
@@ -102,7 +122,7 @@ function Home() {
             schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
             events={timetable}
             firstDay={1}
-            resources={selectedCollegas.map(c => ({ id: c.value, title: c.label }))}
+            resources={selectedCollegas.concat(selectedClasses).map(c => ({ id: c.value, title: c.label }))}
             scrollTime="08:15:00"
             allDaySlot={false}
             eventDisplay="block"
@@ -112,14 +132,15 @@ function Home() {
             eventContent={renderEventContent}
             locale={nlLocale}
             titleFormat={{ day: "2-digit", month: "long", year: "numeric" }}
-            dayHeaderFormat="DD/MM"
+            dayHeaderFormat="ddd DD/MM"
           />
         </Col>
         <Col md={2}>
           <h3>Collega&#39;s</h3>
           <MultiSelect options={getCollegas()} value={selectedCollegas} onChange={setSelectedCollegas} labelledBy="Select" />
 
-          <h3>Klassen</h3>
+          <h3 className="mt-2">Klassen</h3>
+          <MultiSelect options={classOptions} value={selectedClasses} onChange={setSelectedClasses} labelledBy="Select" />
         </Col>
       </Row>
     </>
