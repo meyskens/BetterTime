@@ -183,10 +183,10 @@ function Home() {
             </Dropdown.Menu>
           </Dropdown>
           <h3>Collega&#39;s</h3>
-          <MultiSelect options={getCollegas()} value={selectedCollegas} onChange={setSelectedCollegas} labelledBy="Select" />
+          <MultiSelect options={getCollegas()} value={selectedCollegas} onChange={setSelectedCollegas} hasSelectAll={false} labelledBy="Select" />
 
           <h3 className="mt-2">Klassen</h3>
-          <MultiSelect options={classOptions} value={selectedClasses} onChange={setSelectedClasses} labelledBy="Select" />
+          <MultiSelect options={classOptions} value={selectedClasses} onChange={setSelectedClasses} hasSelectAll={false} labelledBy="Select" />
         </Col>
       </Row>
     </>
