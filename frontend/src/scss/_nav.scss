@@ -4,6 +4,12 @@
   border-bottom: 1px solid #ddd;
   background-color: white;
 
+  .navbar-brand {
+    font-size: 2em;
+    color: #333;
+    font-family: 'Galada', cursive;
+  }
+
   .nav-item {
     font-size: 18px;
     padding: 0.75em;
