@@ -38,11 +38,15 @@ function Home() {
       duration: { days: 7 },
       buttonText: "Week",
       datesAboveResources: selectedClasses.length + selectedCollegas.length > 1,
+      nowIndicator: true,
+      dateAlignment: "week",
     },
     weekParallel: {
       type: "timeGridWeek",
       duration: { days: 7 },
       buttonText: "Week",
+      nowIndicator: true,
+      dateAlignment: "week",
     },
   };
 
