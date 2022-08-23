@@ -11,6 +11,7 @@ func init() {
 	registers = append(registers, func(e *echo.Echo, h *HTTPHandler) {
 		e.GET("/v1/timetable/:id", h.getTimeTable)
 		e.GET("/v1/classes/search", h.searchClasses)
+		e.GET("/v1/rooms/", h.getRooms)
 	})
 }
 
@@ -56,4 +57,17 @@ func (h *HTTPHandler) searchClasses(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, classes)
+}
+
+func (h *HTTPHandler) getRooms(c echo.Context) error {
+	query := c.QueryParam("campus")
+	if query == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "campus is required"})
+	}
+	rooms, err := h.api.GetRoomsForCampus(query)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, rooms)
 }

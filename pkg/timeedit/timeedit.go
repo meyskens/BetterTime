@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
+	"strings"
 	"time"
 
 	"golang.org/x/net/html"
@@ -102,4 +104,94 @@ func (api *TimeEditAPI) GetClassesForQuery(query string) ([]Class, error) {
 	}
 
 	return classes, nil
+}
+
+func (api *TimeEditAPI) GetRoomsForCampus(query string) ([]Class, error) {
+	classes := []Class{}
+	hasMore := true
+	start := 0
+	for hasMore {
+		var c []Class
+		var err error
+		c, hasMore, err = api.getRoomsForPage(query, start, 100)
+		if err != nil {
+			return nil, err
+		}
+		classes = append(classes, c...)
+		start += 100
+	}
+
+	// sort by name
+	sort.Slice(classes, func(i, j int) bool {
+		return classes[i].Name < classes[j].Name
+	})
+
+	return classes, nil
+}
+
+func (api *TimeEditAPI) getRoomsForPage(query string, start, max int) ([]Class, bool, error) {
+	hasMore := false
+
+	// the KUL room type is 4, not enough data to make it universal yet
+	req, err := api.prepareGetCall(fmt.Sprintf("/web/public/objects.html?max=%d&fr=t&partajax=t&im=f&sid=3&l=nl_NL&types=4&fe=20.%s&objects=&start=%d", max, url.QueryEscape(query), start))
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to prepare request: %w", err)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, false, fmt.Errorf("error doing request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	classes := []Class{}
+
+	tokenizer := html.NewTokenizer(resp.Body)
+	// look for <div>
+	tokenType := tokenizer.Next()
+	for tokenType != html.ErrorToken {
+		token := tokenizer.Token()
+		if tokenType == html.StartTagToken && token.Data == "div" {
+			teID := ""
+			name := ""
+			// find data-id = "..."
+			for _, attr := range token.Attr {
+
+				if attr.Key == "data-id" {
+					teID = attr.Val
+				}
+				if attr.Key == "data-name" {
+					name = attr.Val
+				}
+			}
+			if teID != "" && name != "" {
+				classes = append(classes, Class{
+					TimeEditID: teID,
+					Name:       improveSearchClass(name),
+				})
+			}
+		}
+
+		// two ways to detect we have more, to be robust
+		if tokenType == html.StartTagToken && token.Data == "a" {
+			for _, attr := range token.Attr {
+				if attr.Key == "data-text" && attr.Val == "Toon meer resultaat" {
+					hasMore = true
+					break
+				}
+			}
+		}
+		if tokenType == html.StartTagToken && token.Data == "div" {
+			for _, attr := range token.Attr {
+				if attr.Key == "id" && strings.Contains(attr.Val, "nextPage_") {
+					hasMore = true
+					break
+				}
+			}
+		}
+		tokenType = tokenizer.Next()
+	}
+
+	return classes, hasMore, nil
 }

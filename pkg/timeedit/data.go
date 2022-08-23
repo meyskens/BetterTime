@@ -36,6 +36,11 @@ type Class struct {
 	TimeEditID string `json:"timeEditID"`
 }
 
+type Room struct {
+	Name       string `json:"name"`
+	TimeEditID string `json:"timeEditID"`
+}
+
 type teReservation struct {
 	Columns   []string `json:"columns"`
 	Enddate   string   `json:"enddate"`
