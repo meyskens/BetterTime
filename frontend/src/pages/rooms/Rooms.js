@@ -99,6 +99,8 @@ function Home() {
     calendarRef.current.getApi().changeView(calView.value);
   }, [calView]);
 
+  const today = new Date();
+
   const renderEventContent = eventInfo => (
     <>
       <p>
@@ -159,7 +161,7 @@ function Home() {
               ))}
             </Dropdown.Menu>
           </Dropdown>
-          <Calendar onChange={pickDate} className="my-2" value={selectedDateInfo.start} />
+          <Calendar onChange={pickDate} className="my-2" value={selectedDateInfo ? selectedDateInfo.start : today} />
           <h3>Campus</h3>
           <MultiSelect options={getCampus()} value={selectedCampuses} onChange={setSelectedCampuses} hasSelectAll={false} labelledBy="Select" />
 
