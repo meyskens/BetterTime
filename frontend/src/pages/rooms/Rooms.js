@@ -159,7 +159,7 @@ function Home() {
               ))}
             </Dropdown.Menu>
           </Dropdown>
-          <Calendar onChange={pickDate} className="my-2" />
+          <Calendar onChange={pickDate} className="my-2" value={selectedDateInfo.start} />
           <h3>Campus</h3>
           <MultiSelect options={getCampus()} value={selectedCampuses} onChange={setSelectedCampuses} hasSelectAll={false} labelledBy="Select" />
 
