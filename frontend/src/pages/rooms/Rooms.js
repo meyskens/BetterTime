@@ -30,15 +30,6 @@ function Home() {
   const [calView, setCalView] = useState(JSON.parse(localStorage.getItem("calViewRooms")) || calViews[0]);
   const calendarRef = createRef();
 
-  const getMondayOfCurrentWeek = () => {
-    const today = new Date();
-    const first = today.getDate() - today.getDay() + 1;
-
-    const monday = new Date(today.setDate(first));
-    if (today.getDay() === 0) return new Date(today.setDate(first + 7)); // if sunday go to next week
-    return monday;
-  };
-
   const loadRoomOptions = async () => {
     const promises = selectedCampuses.map(campus => getRoomsForCampus(campus.value));
     const result = await Promise.all(promises);
@@ -144,7 +135,6 @@ function Home() {
             titleFormat={{ day: "2-digit", month: "long", year: "numeric" }}
             dayHeaderFormat="ddd DD/MM"
             ref={calendarRef}
-            initialDate={getMondayOfCurrentWeek()}
           />
         </Col>
         <Col md={2}>
