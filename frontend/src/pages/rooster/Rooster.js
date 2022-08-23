@@ -46,6 +46,14 @@ function Home() {
     },
   };
 
+  const getMondayOfCurrentWeek = () => {
+    const today = new Date();
+    const first = today.getDate() - today.getDay() + 1;
+
+    const monday = new Date(today.setDate(first));
+    return monday;
+  };
+
   const loadClassOptions = async () => {
     const promises = CLASS_SEARCH.split(",").map(classSearch => getClassesForQuery(classSearch.trim()));
     const result = await Promise.all(promises);
@@ -166,6 +174,7 @@ function Home() {
             titleFormat={{ day: "2-digit", month: "long", year: "numeric" }}
             dayHeaderFormat="ddd DD/MM"
             ref={calendarRef}
+            initialDate={getMondayOfCurrentWeek()}
           />
         </Col>
         <Col md={2}>
