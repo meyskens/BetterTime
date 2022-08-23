@@ -159,7 +159,7 @@ function Home() {
         </Col>
       </Row>
       <Row>
-        <Col md={10}>
+        <Col md={10} className="order-2 order-md-1">
           <FullCalendar
             plugins={[dayGridPlugin, resourceTimelinePlugin, resourceTimeGridPlugin, momentPlugin, listPlugin]}
             views={views}
@@ -182,7 +182,7 @@ function Home() {
             initialDate={getMondayOfCurrentWeek()}
           />
         </Col>
-        <Col md={2}>
+        <Col md={2} className="order-1 order-md-2 mb-3 mb-md-0">
           <Dropdown>
             <Dropdown.Toggle variant="primary" id="dropdown-basic">
               {calView.name}
