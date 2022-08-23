@@ -51,6 +51,7 @@ function Home() {
     const first = today.getDate() - today.getDay() + 1;
 
     const monday = new Date(today.setDate(first));
+    if (today.getDay() === 0) return new Date(today.setDate(first + 7)); // if sunday go to next week
     return monday;
   };
 
