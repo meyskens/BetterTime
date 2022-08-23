@@ -57,8 +57,18 @@ func (s *serveCmdOptions) RunE(cmd *cobra.Command, args []string) error {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
+	// rewrite paths that frontend uses
+	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if c.Request().URL.Path == "/rooms" {
+				c.Request().URL.Path = "/"
+			}
+			return h(c)
+		}
+
 	// serve Swagger as static content
 	e.Static("/", "static")
+
 
 	// register the HTTP handlers
 	v1.NewHTTPHandler(s.baseURL).Register(e)
