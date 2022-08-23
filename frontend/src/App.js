@@ -1,8 +1,12 @@
 import { Container } from "react-bootstrap";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Provider } from "react-redux";
+
+import "react-calendar/dist/Calendar.css";
+
 import AppNav from "./Nav";
 import Rooster from "./pages/rooster/Rooster";
+import Rooms from "./pages/rooms/Rooms";
 import GlobalToast from "./pages/_components/GlobalToast";
 import store from "./redux/store";
 
@@ -16,6 +20,9 @@ function App() {
         <Container className="content-page">
           <GlobalToast />
           <Switch>
+            <Route path="/rooms">
+              <Rooms />
+            </Route>
             <Route path="/">
               <Rooster />
             </Route>

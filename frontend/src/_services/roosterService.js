@@ -20,4 +20,14 @@ export const getCollegas = () =>
     { value: "240632.3", label: "Ann Hannes" },
   ].sort((a, b) => a.label.localeCompare(b.label));
 
+export const getCampus = () =>
+  [
+    { value: "TM/KU Leuven Campus Geel", label: "TM/KU Leuven Campus Geel" },
+    { value: "TM - Campus Lier", label: "TM - Campus Lier" },
+    { value: "TM - Campus Turnhout", label: "TM - Campus Turnhout" },
+    { value: "TM - Campus Vorselaar", label: "TM - Campus Vorselaar" },
+  ].sort((a, b) => a.label.localeCompare(b.label));
+
 export const getClassesForQuery = query => fetch(`${API_URL}/v1/classes/search?query=${encodeURIComponent(query)}`).then(response => response.json());
+
+export const getRoomsForCampus = query => fetch(`${API_URL}/v1/rooms/?campus=${encodeURIComponent(query)}`).then(response => response.json());

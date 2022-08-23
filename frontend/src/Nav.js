@@ -16,7 +16,7 @@ function AppNav() {
             </LinkContainer>
           </NavItem>
           <NavItem className="normal-link">
-            <LinkContainer to="/lokalen">
+            <LinkContainer to="/rooms">
               <Nav.Link>Lokalen</Nav.Link>
             </LinkContainer>
           </NavItem>
