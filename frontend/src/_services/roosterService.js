@@ -17,6 +17,7 @@ export const getCollegas = () =>
     { value: "245069.3", label: "Joeri Verlooy" },
     { value: "378880.3", label: "Brent Pulmans" },
     { value: "245084.3", label: "Quinten Desmyter" },
+    { value: "240632.3", label: "Ann Hannes" },
   ].sort((a, b) => a.label.localeCompare(b.label));
 
 export const getClassesForQuery = query => fetch(`${API_URL}/v1/classes/search?query=${encodeURIComponent(query)}`).then(response => response.json());
