@@ -19,16 +19,17 @@ func MustLoadTZ(tz string) *time.Location {
 var tz = MustLoadTZ("Europe/Brussels")
 
 type Event struct {
-	OLA      string    `json:"ola"`
-	ZCode    string    `json:"zCode"`
-	Room     string    `json:"room"`
-	Campus   string    `json:"campus"`
-	RoomInfo string    `json:"roomInfo"`
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
-	Classes  []string  `json:"classes"`
-	Type     string    `json:"type"`
-	Teachers []string  `json:"teachers"`
+	OLA        string    `json:"ola"`
+	ZCode      string    `json:"zCode"`
+	Room       string    `json:"room"`
+	Campus     string    `json:"campus"`
+	RoomInfo   string    `json:"roomInfo"`
+	Start      time.Time `json:"start"`
+	End        time.Time `json:"end"`
+	Classes    []string  `json:"classes"`
+	Type       string    `json:"type"`
+	Teachers   []string  `json:"teachers"`
+	TimeEditID string    `json:"timeEditID"`
 }
 
 type Class struct {
@@ -92,15 +93,16 @@ func (te *teReservation) ToEvent(cols []string) Event {
 	endTime, _ := time.ParseInLocation("02-01-2006 15:04", fmt.Sprintf("%s %s", te.Enddate, te.Endtime), tz)
 
 	return Event{
-		OLA:      olaMatches[2],
-		ZCode:    "Z" + olaMatches[1],
-		Room:     roomName,
-		Campus:   campus,
-		RoomInfo: info,
-		Start:    startTime,
-		End:      endTime,
-		Type:     te.Columns[typeIndex],
-		Classes:  improveClasses(te.Columns[classesIndex]),
+		OLA:        olaMatches[2],
+		ZCode:      "Z" + olaMatches[1],
+		Room:       roomName,
+		Campus:     campus,
+		RoomInfo:   info,
+		Start:      startTime,
+		End:        endTime,
+		Type:       te.Columns[typeIndex],
+		Classes:    improveClasses(te.Columns[classesIndex]),
+		TimeEditID: te.ID,
 	}
 }
 
