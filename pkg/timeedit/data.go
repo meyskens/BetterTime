@@ -30,6 +30,7 @@ type Event struct {
 	Type       string    `json:"type"`
 	Teachers   []string  `json:"teachers"`
 	TimeEditID string    `json:"timeEditID"`
+	ExtraInfo  string    `json:"extraInfo"`
 }
 
 type Class struct {
@@ -68,6 +69,8 @@ func (te *teReservation) ToEvent(cols []string) Event {
 	roomIndex := -1
 	classesIndex := -1
 	typeIndex := -1
+	titleIndex := -1
+	infoIndex := -1
 
 	for i, col := range cols {
 		if col == "OLA" {
@@ -82,6 +85,12 @@ func (te *teReservation) ToEvent(cols []string) Event {
 		if col == "Klasgroep" {
 			classesIndex = i
 		}
+		if col == "Titel" {
+			titleIndex = i
+		}
+		if col == "Info voor de student" {
+			infoIndex = i
+		}
 	}
 
 	// fetch ola name and zcode
@@ -92,8 +101,18 @@ func (te *teReservation) ToEvent(cols []string) Event {
 	startTime, _ := time.ParseInLocation("02-01-2006 15:04", fmt.Sprintf("%s %s", te.Startdate, te.Starttime), tz)
 	endTime, _ := time.ParseInLocation("02-01-2006 15:04", fmt.Sprintf("%s %s", te.Enddate, te.Endtime), tz)
 
+	olaName := olaMatches[2]
+	if titleIndex > -1 {
+		olaName = te.Columns[titleIndex] + " (" + olaName + ")"
+	}
+
+	info := ""
+	if infoIndex > -1 {
+		info = te.Columns[infoIndex]
+	}
+
 	return Event{
-		OLA:        olaMatches[2],
+		OLA:        olaName,
 		ZCode:      "Z" + olaMatches[1],
 		Room:       roomName,
 		Campus:     campus,
@@ -103,6 +122,7 @@ func (te *teReservation) ToEvent(cols []string) Event {
 		Type:       te.Columns[typeIndex],
 		Classes:    improveClasses(te.Columns[classesIndex]),
 		TimeEditID: te.ID,
+		ExtraInfo:  info,
 	}
 }
 
