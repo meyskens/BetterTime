@@ -3,14 +3,26 @@ package timeedit
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/bxcodec/httpcache"
 	"golang.org/x/net/html"
 )
+
+var client = &http.Client{}
+
+func init() {
+	_, err := httpcache.NewWithInmemoryCache(client, false, time.Second*60*30)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 type TimeEditAPI struct {
 	baseURL string
@@ -38,7 +50,6 @@ func (api *TimeEditAPI) GetTimeTableForID(id string, from, to time.Time) ([]Even
 		return nil, fmt.Errorf("failed to prepare request: %w", err)
 	}
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error doing request: %v", err)

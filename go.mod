@@ -13,6 +13,8 @@ require (
 
 require (
 	github.com/arran4/golang-ical v0.0.0-20220517104411-fd89fefb0182 // indirect
+	github.com/bxcodec/gotcha v1.0.0-beta.2 // indirect
+	github.com/bxcodec/httpcache v1.0.0-beta.3 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
