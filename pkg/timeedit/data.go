@@ -102,7 +102,7 @@ func (te *teReservation) ToEvent(cols []string) Event {
 	endTime, _ := time.ParseInLocation("02-01-2006 15:04", fmt.Sprintf("%s %s", te.Enddate, te.Endtime), tz)
 
 	olaName := olaMatches[2]
-	if titleIndex > -1 {
+	if titleIndex > -1 && te.Columns[titleIndex] != "" {
 		olaName = te.Columns[titleIndex] + " (" + olaName + ")"
 	}
 
