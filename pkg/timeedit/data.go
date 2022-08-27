@@ -106,9 +106,9 @@ func (te *teReservation) ToEvent(cols []string) Event {
 		olaName = te.Columns[titleIndex] + " (" + olaName + ")"
 	}
 
-	info := ""
+	extraInfo := ""
 	if infoIndex > -1 {
-		info = te.Columns[infoIndex]
+		extraInfo = te.Columns[infoIndex]
 	}
 
 	return Event{
@@ -122,7 +122,7 @@ func (te *teReservation) ToEvent(cols []string) Event {
 		Type:       te.Columns[typeIndex],
 		Classes:    improveClasses(te.Columns[classesIndex]),
 		TimeEditID: te.ID,
-		ExtraInfo:  info,
+		ExtraInfo:  extraInfo,
 	}
 }
 
