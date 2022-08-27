@@ -1,4 +1,4 @@
-import { Row, Col, Dropdown } from "react-bootstrap";
+import { Row, Col, Dropdown, Button, OverlayTrigger, Popover, Form, InputGroup } from "react-bootstrap";
 import { useEffect, useState, createRef } from "react";
 
 import { MultiSelect } from "react-multi-select-component";
@@ -12,7 +12,8 @@ import nlLocale from "@fullcalendar/core/locales/nl";
 import momentPlugin from "@fullcalendar/moment";
 
 import { getTimetableForID, getCollegas, getClassesForQuery } from "../../_services/roosterService";
-import { CLASS_SEARCH } from "../../Config";
+import { CLASS_SEARCH, API_URL } from "../../Config";
+import toastService from "../../_services/toastService";
 
 const calViews = [
   { name: "Week", value: "resourceTimeGridSevenDay" },
@@ -154,6 +155,33 @@ function Home() {
     </>
   );
 
+  const exportPopover = () => {
+    const url = `${API_URL}/v1/ical/?id=${selectedCollegas
+      .concat(selectedClasses)
+      .map(l => l.value)
+      .join(",")
+      .trim(",")}`;
+    const copyUrl = () => {
+      navigator.clipboard.writeText(url);
+      toastService.send({ title: "Success", message: "URL gekopieerd naar klembord" });
+    };
+    return (
+      <Popover>
+        <Popover.Header as="h3">Exporteer</Popover.Header>
+        <Popover.Body>
+          <p>Je kan deze rooster gebruiken in Outlook, Google Calendar of bijna elke andere software. Kopieer onderstaande URL en voeg deze als webkalender.</p>
+          <InputGroup>
+            <Form.Control aria-label="ical url" onClick={copyUrl} disabled value={url} />
+            <InputGroup.Text id="basic-addon2" onClick={copyUrl}>
+              <i className="fa-solid fa-copy" />
+            </InputGroup.Text>
+          </InputGroup>
+          <p className="text-muted text-small">(deze gaat tot 240 dagen verder en 14 dagen terug, in tegenstelling tot de 30 in TE)</p>
+        </Popover.Body>
+      </Popover>
+    );
+  };
+
   return (
     <>
       <Row>
@@ -204,6 +232,14 @@ function Home() {
 
           <h3 className="mt-2">Klassen</h3>
           <MultiSelect options={classOptions} value={selectedClasses} onChange={setSelectedClasses} hasSelectAll={false} labelledBy="Select" />
+
+          {selectedClasses.concat(selectedCollegas).length > 0 && (
+            <OverlayTrigger trigger="click" placement="bottom" overlay={exportPopover()}>
+              <Button variant="secondary" className="mt-5">
+                <i className="fas fa-file-export" /> Export
+              </Button>
+            </OverlayTrigger>
+          )}
         </Col>
       </Row>
     </>

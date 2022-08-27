@@ -26,7 +26,7 @@ func (h *HTTPHandler) getIcal(c echo.Context) error {
 	events := []timeedit.Event{}
 
 	for _, id := range ids {
-		e, err := h.api.GetTimeTableForID(id, time.Now().Add(-14*time.Hour), time.Now().Add(180*24*time.Hour))
+		e, err := h.api.GetTimeTableForID(id, time.Now().Add(-14*time.Hour), time.Now().Add(240*24*time.Hour))
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 		}
