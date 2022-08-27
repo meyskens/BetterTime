@@ -103,6 +103,7 @@ function Home() {
             room: c.room,
             classes: c.classes,
             source: c.source,
+            extraInfo: c.extraInfo,
           },
         });
       }),
@@ -145,8 +146,10 @@ function Home() {
           {eventInfo.event.extendedProps.campus && " "}
           {eventInfo.event.extendedProps.room}
         </b>
-        <br />
+        {eventInfo.event.extendedProps.classes.length > 0 && <br />}
         {eventInfo.event.extendedProps.classes.join(" ")}
+        {eventInfo.event.extendedProps.extraInfo && <br />}
+        {eventInfo.event.extendedProps.extraInfo}
       </p>
     </>
   );
