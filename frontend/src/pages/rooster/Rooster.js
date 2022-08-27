@@ -93,7 +93,6 @@ function Home() {
     const events = [];
     result.map(res =>
       res.forEach(c => {
-        console.log(c);
         events.push({
           title: c.ola,
           start: c.start,
