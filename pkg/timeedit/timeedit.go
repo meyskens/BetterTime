@@ -77,7 +77,6 @@ func (api *TimeEditAPI) GetClassesForQuery(query string) ([]Class, error) {
 		return nil, fmt.Errorf("failed to prepare request: %w", err)
 	}
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error doing request: %v", err)
@@ -149,7 +148,6 @@ func (api *TimeEditAPI) getRoomsForPage(query string, start, max int) ([]Class, 
 		return nil, false, fmt.Errorf("failed to prepare request: %w", err)
 	}
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, false, fmt.Errorf("error doing request: %v", err)
