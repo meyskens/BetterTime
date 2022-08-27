@@ -20,6 +20,7 @@ export const getCollegas = () =>
     { value: "240632.3", label: "Ann Hannes" },
     { value: "240760.3", label: "Jochen Mariën" },
     { value: "244864.3", label: "Joren Synaeve" },
+    { value: "240913.3", label: "Maarten Van Lint" },
   ].sort((a, b) => a.label.localeCompare(b.label));
 
 export const getCampus = () =>
