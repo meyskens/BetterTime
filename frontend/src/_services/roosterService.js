@@ -7,7 +7,9 @@ export const getApiURL = () => API_URL;
 
 export const getTimetableForID = (id, from, to) =>
   fetch(
-    `${API_URL}/v1/timetable/${id}?from=${from ? new Date(from).toLocaleDateString("se-SE") : ""}&to=${to ? new Date(to).toLocaleDateString("se-SE") : ""}`,
+    `${API_URL}/v1/timetable/${id}?from=${from ? new Date(from).toISOString().substring(0, 10) : ""}&to=${
+      to ? new Date(to).toISOString().substring(0, 10) : ""
+    }`,
   ).then(response => response.json());
 
 // the TE Public API does not want to give this, so we got it the manual way
