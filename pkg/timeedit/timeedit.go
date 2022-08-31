@@ -25,12 +25,14 @@ func init() {
 }
 
 type TimeEditAPI struct {
-	baseURL string
+	baseURL  string
+	typeUser string
 }
 
 func NewTimeEditAPI(baseURL string) *TimeEditAPI {
 	return &TimeEditAPI{
-		baseURL: baseURL,
+		baseURL:  baseURL,
+		typeUser: "public",
 	}
 }
 
@@ -45,7 +47,7 @@ func (api *TimeEditAPI) prepareGetCall(path string) (*http.Request, error) {
 }
 
 func (api *TimeEditAPI) GetTimeTableForID(id string, from, to time.Time) ([]Event, error) {
-	req, err := api.prepareGetCall(fmt.Sprintf("/web/public/ri.json?h=t&sid=3&p=%s.x%%2C%s.x&objects=%s&ox=0&types=0&fe=0", from.Format("20060102"), to.Format("20060102"), id))
+	req, err := api.prepareGetCall(fmt.Sprintf("/web/%s/ri.json?h=t&sid=3&p=%s.x%%2C%s.x&objects=%s&ox=0&types=0&fe=0", api.typeUser, from.Format("20060102"), to.Format("20060102"), id))
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare request: %w", err)
 	}
@@ -72,7 +74,7 @@ func (api *TimeEditAPI) GetTimeTableForID(id string, from, to time.Time) ([]Even
 
 func (api *TimeEditAPI) GetClassesForQuery(query string) ([]Class, error) {
 	// the KUL class type is 11, not enough data to make it universal yet
-	req, err := api.prepareGetCall(fmt.Sprintf("/web/public/objects.html?max=100&fr=t&partajax=t&im=f&sid=3&l=nl_NL&search_text=%s&types=11&objects=", url.QueryEscape(query)))
+	req, err := api.prepareGetCall(fmt.Sprintf("/web/%s/objects.html?max=100&fr=t&partajax=t&im=f&sid=3&l=nl_NL&search_text=%s&types=11&objects=", api.typeUser, url.QueryEscape(query)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare request: %w", err)
 	}
@@ -143,7 +145,7 @@ func (api *TimeEditAPI) getRoomsForPage(query string, start, max int) ([]Class, 
 	hasMore := false
 
 	// the KUL room type is 4, not enough data to make it universal yet
-	req, err := api.prepareGetCall(fmt.Sprintf("/web/public/objects.html?max=%d&fr=t&partajax=t&im=f&sid=3&l=nl_NL&types=4&fe=20.%s&objects=&start=%d", max, url.QueryEscape(query), start))
+	req, err := api.prepareGetCall(fmt.Sprintf("/web/%s/objects.html?max=%d&fr=t&partajax=t&im=f&sid=3&l=nl_NL&types=4&fe=20.%s&objects=&start=%d", api.typeUser, max, url.QueryEscape(query), start))
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to prepare request: %w", err)
 	}
