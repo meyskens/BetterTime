@@ -2,9 +2,11 @@ package timeedit
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"sort"
 	"strings"
@@ -12,28 +14,60 @@ import (
 
 	"github.com/bxcodec/httpcache"
 	"golang.org/x/net/html"
+	"golang.org/x/net/publicsuffix"
 )
 
-var client = &http.Client{}
+type TimeEditAPI struct {
+	baseURL  string
+	typeUser string
 
-func init() {
+	cookieJar *cookiejar.Jar
+	client    *http.Client
+
+	lastLogin time.Time
+}
+
+func NewTimeEditAPI(baseURL string) *TimeEditAPI {
+	client := &http.Client{}
 	_, err := httpcache.NewWithInmemoryCache(client, false, time.Second*60*30)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-type TimeEditAPI struct {
-	baseURL  string
-	typeUser string
-}
-
-func NewTimeEditAPI(baseURL string) *TimeEditAPI {
 	return &TimeEditAPI{
 		baseURL:  baseURL,
 		typeUser: "public",
+		client:   client,
 	}
+}
+
+func NewTimeEditExperimentalStaffAPI(baseURL string) *TimeEditAPI {
+	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client := &http.Client{
+		Jar: jar,
+	}
+	_, err = httpcache.NewWithInmemoryCache(client, false, time.Second*60*30)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	te := &TimeEditAPI{
+		baseURL:   baseURL,
+		typeUser:  "staff",
+		cookieJar: jar,
+		client:    client,
+	}
+
+	err = te.doLogin()
+	if err != nil {
+		panic(err)
+	}
+	return te
 }
 
 func (api *TimeEditAPI) prepareGetCall(path string) (*http.Request, error) {
@@ -52,9 +86,17 @@ func (api *TimeEditAPI) GetTimeTableForID(id string, from, to time.Time) ([]Even
 		return nil, fmt.Errorf("failed to prepare request: %w", err)
 	}
 
-	resp, err := client.Do(req)
+	resp, err := api.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error doing request: %v", err)
+	}
+
+	if resp.StatusCode == 412 {
+		err = api.doLogin()
+		if err != nil {
+			return nil, errors.New("failed to login")
+		}
+		return api.GetTimeTableForID(id, from, to)
 	}
 
 	// parse json
@@ -79,11 +121,19 @@ func (api *TimeEditAPI) GetClassesForQuery(query string) ([]Class, error) {
 		return nil, fmt.Errorf("failed to prepare request: %w", err)
 	}
 
-	resp, err := client.Do(req)
+	resp, err := api.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error doing request: %v", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == 412 {
+		err = api.doLogin()
+		if err != nil {
+			return nil, errors.New("failed to login")
+		}
+		return api.GetClassesForQuery(query)
+	}
 
 	classes := []Class{}
 
@@ -150,11 +200,19 @@ func (api *TimeEditAPI) getRoomsForPage(query string, start, max int) ([]Class, 
 		return nil, false, fmt.Errorf("failed to prepare request: %w", err)
 	}
 
-	resp, err := client.Do(req)
+	resp, err := api.client.Do(req)
 	if err != nil {
 		return nil, false, fmt.Errorf("error doing request: %v", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == 412 {
+		err = api.doLogin()
+		if err != nil {
+			return nil, false, errors.New("failed to login")
+		}
+		return api.getRoomsForPage(query, start, max)
+	}
 
 	classes := []Class{}
 

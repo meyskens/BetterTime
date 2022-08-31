@@ -82,7 +82,7 @@ func (te *teReservation) ToEvent(cols []string) Event {
 		if col == "Activiteitstype" {
 			typeIndex = i
 		}
-		if col == "Klasgroep" {
+		if col == "Klasgroep" || col == "Publicatie-info" {
 			classesIndex = i
 		}
 		if col == "Titel" {
@@ -200,6 +200,7 @@ func improveSearchClass(class string) string {
 	class = strings.TrimSpace(class)
 
 	class = strings.Split(class, "-2022")[0] // filter out -2022-xxxx, the 2023 is a problem for next year!
+	class = strings.Split(class, ",")[0]     // staff API gives clusters...
 
 	return class
 }
