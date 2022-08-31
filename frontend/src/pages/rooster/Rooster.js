@@ -1,4 +1,4 @@
-import { Row, Col, Dropdown, Button, OverlayTrigger, Popover, Form, InputGroup } from "react-bootstrap";
+import { Row, Col, Dropdown, Button, OverlayTrigger, Popover, Form, InputGroup, Alert } from "react-bootstrap";
 import { useEffect, useState, createRef } from "react";
 
 import { MultiSelect } from "react-multi-select-component";
@@ -187,6 +187,12 @@ function Home() {
         <Col>
           <h2>Rooster</h2>
         </Col>
+      </Row>
+      <Row>
+        <Alert variant="warning">
+          Door aanhoudende problemen bij de KUL TimeEdit kan de informatie tijdelijk niet beschikbaar zijn. BetterTime is niet verantwoordelijk voor deze
+          problemen.
+        </Alert>
       </Row>
       <Row>
         <Col md={10} className="order-2 order-md-1">
