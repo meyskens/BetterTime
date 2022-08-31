@@ -29,6 +29,7 @@ export const getCollegas = () =>
     { value: "240568.3", label: "Patrick Dielens" },
     { value: "240578.3", label: "Patrick Verhaert" },
     { value: "240586.3", label: "Paul Boonen" },
+    { value: "245472.3", label: "Davy Cavens" },
   ].sort((a, b) => a.label.localeCompare(b.label));
 
 export const getCampus = () =>
