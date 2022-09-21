@@ -65,7 +65,7 @@ func NewTimeEditExperimentalStaffAPI(baseURL string) *TimeEditAPI {
 
 	err = te.doLogin()
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	return te
 }
