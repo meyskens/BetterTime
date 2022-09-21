@@ -13,7 +13,7 @@ type HTTPHandler struct {
 
 func NewHTTPHandler(baseURL string) *HTTPHandler {
 	return &HTTPHandler{
-		api: timeedit.NewTimeEditAPI(baseURL),
+		api: timeedit.NewTimeEditExperimentalStaffAPI(baseURL),
 	}
 }
 
