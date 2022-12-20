@@ -16,7 +16,7 @@ WORKDIR /go/src/github.com/meyskens/BetterTime
 
 RUN go build ./cmd/bettertime
 
-FROM alpine:3.16
+FROM alpine:3.17
 
 RUN mkdir /app
 WORKDIR /app
