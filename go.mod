@@ -6,7 +6,7 @@ require (
 	github.com/arran4/golang-ical v0.0.0-20220517104411-fd89fefb0182
 	github.com/bxcodec/httpcache v1.0.0-beta.3
 	github.com/golang/glog v1.0.0
-	github.com/labstack/echo/v4 v4.8.0
+	github.com/labstack/echo/v4 v4.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.12.0
